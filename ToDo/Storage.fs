@@ -31,7 +31,10 @@ module Domain =
 
 [<RequireQualifiedAccess>]
 module Storage =
-    let private database = new LiteDB.LiteDatabase "Filename=Todo.db"
+    open System.IO
+    let private path = 
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Todo.db")
+    let private database = new LiteDB.LiteDatabase $"Filename={path}"
     let private todos = database.GetCollection<Todo> "todos"
 
     let get = todos.FindAll >> Seq.sortBy created >> List.ofSeq
