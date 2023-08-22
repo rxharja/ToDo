@@ -73,14 +73,14 @@ let update msg state =
         
 let appTitle = 
     TextBlock.create [ 
-        DockPanel.dock Dock.Top
+        Grid.row 0
         TextBlock.classes ["title"]
         TextBlock.text "My To-Do List" 
     ]
     
 let inputControl state dispatch =
     Grid.create [
-        DockPanel.dock Dock.Top
+        Grid.row 1
         Grid.margin (10,10)
         Grid.columnDefinitions (ColumnDefinitions.Parse "80*,20*")
         Grid.children [
@@ -182,34 +182,15 @@ let todoView (state: state) (dispatch: Msg -> unit): IView list =
 let todoList state dispatch = 
     ScrollViewer.create [
         DockPanel.dock Dock.Top
-        ScrollViewer.height 300
         ScrollViewer.content 
             (StackPanel.create [ 
                 StackPanel.children (todoView state dispatch) 
             ])
     ]
     
-let total state dispatch =
-    StackPanel.create [
-        DockPanel.dock Dock.Top
-        StackPanel.margin (12,10)
-        StackPanel.verticalAlignment VerticalAlignment.Bottom
-        StackPanel.horizontalAlignment HorizontalAlignment.Right
-        StackPanel.orientation Orientation.Horizontal
-        StackPanel.children [
-            if state.todos |> List.filter completed |> List.length > 0 
-            then Button.create [
-                    Button.verticalAlignment VerticalAlignment.Center
-                    Button.horizontalAlignment HorizontalAlignment.Right
-                    Button.content $"Clear {List.sumBy (completed >> toInt) state.todos}"
-                    Button.onClick (fun _ -> dispatch ClearCompleted)
-                 ]
-        ]
-    ]
-
 let filterPanel state dispatch =            
     TabControl.create [
-        DockPanel.dock Dock.Top
+        Grid.row 2
         TabControl.viewItems [
             TabItem.create [
                 TabItem.content (todoList state dispatch)
@@ -227,10 +208,30 @@ let filterPanel state dispatch =
             ]
         ]
     ]
-    
+
+let total state dispatch =
+    StackPanel.create [
+        Grid.row 3
+        StackPanel.margin (12,10)
+        StackPanel.verticalAlignment VerticalAlignment.Bottom
+        StackPanel.horizontalAlignment HorizontalAlignment.Right
+        StackPanel.orientation Orientation.Horizontal
+        StackPanel.children [
+            if state.todos |> List.filter completed |> List.length > 0 
+            then Button.create [
+                    Button.verticalAlignment VerticalAlignment.Center
+                    Button.horizontalAlignment HorizontalAlignment.Right
+                    Button.content $"Clear {List.sumBy (completed >> toInt) state.todos}"
+                    Button.onClick (fun _ -> dispatch ClearCompleted)
+                 ]
+        ]
+    ]
+
 let render state dispatch =
-    DockPanel.create [
-        DockPanel.children [
+    Grid.create [
+        Grid.rowDefinitions (RowDefinitions.Parse("50,50,350*,50"))
+        Grid.columnDefinitions (ColumnDefinitions.Parse("*"))
+        Grid.children [
             appTitle
 
             inputControl state dispatch
